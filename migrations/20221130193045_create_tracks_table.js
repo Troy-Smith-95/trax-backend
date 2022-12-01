@@ -6,7 +6,6 @@ exports.up = function (knex) {
     return knex.schema.createTable('tracks', (table) => {
         table.increments('id').primary();
         table.string('track_name').notNullable();
-        table.string('artist_name').notNullable();
         table.integer("genre_id").unsigned().notNullable();
         table
             .foreign('genre_id')
