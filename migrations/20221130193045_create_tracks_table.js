@@ -19,19 +19,19 @@ exports.up = function (knex) {
             .onUpdate('CASCADE')
             .onDelete('CASCADE');
         table.string('spotify_id').notNullable();
-        table.float('acousticness').notNullable();
-        table.float('danceability').notNullable();
+        table.float('acousticness', 16, 8).notNullable();
+        table.float('danceability', 16, 8).notNullable();
         table.integer('duration_ms').notNullable();
-        table.float('energy').notNullable();
-        table.float('instrumentalness').notNullable();
+        table.float('energy', 16, 8).notNullable();
+        table.float('instrumentalness', 16, 8).notNullable();
         table.integer('key').notNullable();
-        table.float('liveness').notNullable();
-        table.float('loudness').notNullable();
+        table.float('liveness', 16, 8).notNullable();
+        table.float('loudness', 16, 8).notNullable();
         table.integer('mode').notNullable();
-        table.float('speechiness').notNullable();
-        table.float('tempo').notNullable();
+        table.float('speechiness', 16, 8).notNullable();
+        table.float('tempo', 16, 8).notNullable();
         table.integer('time_signature').notNullable();
-        table.float('valence').notNullable();
+        table.float('valence', 16, 8).notNullable();
     });
 };
 
