@@ -4,7 +4,7 @@
  */
 exports.up = function (knex) {
     return knex.schema.createTable('tracks', (table) => {
-        table.increments('id').primary();
+        table.uuid('id').primary();
         table.string('track_name').notNullable();
         table.integer("genre_id").unsigned().notNullable();
         table

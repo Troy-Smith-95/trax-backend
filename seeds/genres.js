@@ -8,8 +8,13 @@ exports.seed = async function(knex) {
   await knex('genres').insert([
     { 
       id: 1,
-      genre_name: 'hip-hop',
+      genre_name: 'Hip-Hop',
       slug: 'hip-hop'
+    },
+    { 
+      id: 2,
+      genre_name: 'Pop',
+      slug: 'pop'
     },
   ]);
 };

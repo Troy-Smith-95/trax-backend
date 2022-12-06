@@ -16,5 +16,15 @@ exports.seed = async function(knex) {
       genre_id: 1,
       spotify_id: '37i9dQZF1DWY6tYEFs22tT'
     },
+    {
+      playlist_name: "Today's Top Hits",
+      genre_id: 2,
+      spotify_id: '37i9dQZF1DXcBWIGoYBM5M'
+    },
+    {
+      playlist_name: 'Pop All Day',
+      genre_id: 2,
+      spotify_id: '37i9dQZF1DXarRysLJmuju'
+    },
   ]);
 };

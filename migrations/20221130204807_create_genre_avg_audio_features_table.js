@@ -4,27 +4,27 @@
  */
  exports.up = function (knex) {
     return knex.schema.createTable('genre_avg_audio_features', (table) => {
-        table.increments('id').primary(); 
+        table.uuid('id').primary(); 
         table.integer("genre_id").unsigned().notNullable();       
         table
             .foreign('genre_id')
             .references('genres.id')
             .onUpdate('CASCADE')
             .onDelete('CASCADE');
-        table.timestamp('created_at');
-        table.float('acousticness').notNullable();
-        table.float('danceability').notNullable();
+        table.bigint('created_at');
+        table.float('acousticness', 16, 8).notNullable();
+        table.float('danceability', 16, 8).notNullable();
         table.integer('duration_ms').notNullable();
-        table.float('energy').notNullable();
-        table.float('instrumentalness').notNullable();
+        table.float('energy', 16, 8).notNullable();
+        table.float('instrumentalness', 16, 8).notNullable();
         table.integer('key').notNullable();
-        table.float('liveness').notNullable();
-        table.float('loudness').notNullable();
+        table.float('liveness', 16, 8).notNullable();
+        table.float('loudness', 16, 8).notNullable();
         table.integer('mode').notNullable();
-        table.float('speechiness').notNullable();
-        table.float('tempo').notNullable();
+        table.float('speechiness', 16, 8).notNullable();
+        table.float('tempo', 16, 8).notNullable();
         table.integer('time_signature').notNullable();
-        table.float('valence').notNullable();
+        table.float('valence', 16, 8).notNullable();
     });
 };
 
