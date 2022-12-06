@@ -17,8 +17,8 @@ app.use(express.json());
 app.use('/genres', genresRoute);
 
 
-// populateData();
-knex('genre_avg_audio_features').then((data) => console.log(data));
+populateData();
+// knex('genre_avg_audio_features').then((data) => console.log(data));
 
 
 app.listen(PORT, () => {
