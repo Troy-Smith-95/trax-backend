@@ -16,7 +16,7 @@ app.use(express.json());
 app.use('/genres', genresRoute);
 
 
-// populateData();
+populateData();
 // knex('tracks').where({track_name: "Rich Flex"}).then((data) => console.log(data));
 
 

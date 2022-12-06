@@ -11,5 +11,10 @@ exports.seed = async function(knex) {
       genre_id: 1,
       spotify_id: '37i9dQZF1DX0XUsuxWHRQd'
     },
+    {
+      playlist_name: 'Hip-Hop Central',
+      genre_id: 1,
+      spotify_id: '37i9dQZF1DWY6tYEFs22tT'
+    },
   ]);
 };
