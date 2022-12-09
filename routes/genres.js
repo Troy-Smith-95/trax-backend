@@ -6,5 +6,7 @@ const genresController = require('../controllers/genresController');
 
 router.route('/').get(genresController.getAll);
 
+router.route('/:id/audio-features').get(genresController.getAudioFeatures);
+
 
 module.exports = router;
