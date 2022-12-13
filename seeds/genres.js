@@ -16,5 +16,15 @@ exports.seed = async function(knex) {
       genre_name: 'Pop',
       slug: 'pop'
     },
+    { 
+      id: 3,
+      genre_name: 'Alternative',
+      slug: 'alternative'
+    },
+    { 
+      id: 4,
+      genre_name: 'Dance',
+      slug: 'dance'
+    },
   ]);
 };

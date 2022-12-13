@@ -5,7 +5,7 @@ const { v4: uuid } = require('uuid');
 require('dotenv').config();
 
 //amount of time to delays axios calls by in milliseconds
-const ms = 5;
+const ms = 50;
 
 //Function to delay axios calls to avoid hitting rate limit
 const sleep = ms => {
@@ -29,6 +29,8 @@ const data = qs.stringify({ 'grant_type': 'client_credentials' });
 
 const access_token = {};
 
+const authHeader = {};
+
 //function to retrieve the access token 
 async function getToken() {
     let response;
@@ -38,24 +40,22 @@ async function getToken() {
         console.log(`Error retrieving access token: ${error}`);
         return getToken();
     }
-    return response.data.access_token;
+    access_token.token = response.data.access_token;
+    access_token.timestamp = Date.now();
+    //Construct header for API calls
+    authHeader.headers = { 'Authorization': `Bearer ${access_token.token}` };
 }
 
 //Function to orchestrate the collection of data 
 async function populateData() {
     //Delete tracks from previous week
     await knex('tracks').del();
-    //Get new access token to make API calls with
-    access_token.token = await getToken();
-    access_token.timestamp = Date.now();
-    //Construct header for API calls
-    const authHeader = {
-        headers: {
-            'Authorization': `Bearer ${access_token.token}`,
-        }
-    }
+
     //Retrieve array of playlists from database
     const playlists = await knex('playlists');
+
+    //Get new access token to make API calls with
+    await getToken();
 
     //Loop through playlists and get all the track data
     for (let i = 0; i < playlists.length; i++) {
@@ -63,6 +63,7 @@ async function populateData() {
         const tracks = await getTracks(playlists[i], authHeader, tracks_tries);
         //Insert track data from playlist into database
         await knex('tracks').insert(tracks);
+        await getToken();
     }
 
     //Retrieve array of genres from database
@@ -88,8 +89,8 @@ async function getTracks(playlist, authHeader, tracks_tries) {
     try {
         //Get playlist data from spotify API
         const tracks_info = await getPlaylist(playlist, authHeader);
-        const playlist_length = tracks_info.total;
-        const playlist_tracks = tracks_info.items;
+        const playlist_length = tracks_info.length;
+        const playlist_tracks = tracks_info;
         const tracks = [];
         console.log(playlist_length);
 
@@ -105,8 +106,12 @@ async function getTracks(playlist, authHeader, tracks_tries) {
                     return await axios.get(`${track_id}`, authHeader);
 
                 } catch (error) {
-                    track_tries++;
                     console.log(`Error in getting a specific track: ${error}`);
+                    //If the returned status is too many requests this will delay any futher calls for the amount of time stated in the retry-after part of the header
+                    if (error.response.status === 429) {
+                        await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                    }
+                    track_tries++;
                     if (track_tries < 5) {
                         return getTrack(track_id);
                     }
@@ -116,7 +121,7 @@ async function getTracks(playlist, authHeader, tracks_tries) {
             await sleep(ms);
             const track = await getTrack(playlist_tracks[i].track.href);
             //Only assign if track API call was successfull
-            if (track) {
+            if (track !== undefined) {
                 //Assign values to new track
                 newTrack.id = uuid();
                 newTrack.track_name = track.data.name;
@@ -131,8 +136,11 @@ async function getTracks(playlist, authHeader, tracks_tries) {
                         return await axios.get(`${URL_API}/audio-features/${spotify_id}`, authHeader);
 
                     } catch (error) {
-                        audio_tries++;
                         console.log(`Error in getting audio features of a specific track: ${error}`);
+                        if (error.response.status === 429) {
+                            await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                        }
+                        audio_tries++;
                         if (audio_tries < 5) {
                             return getAudioFeatures(spotify_id);
                         }
@@ -164,8 +172,11 @@ async function getTracks(playlist, authHeader, tracks_tries) {
         }
         return tracks;
     } catch (error) {
-        tracks_tries++;
         console.log(`General error in getTracks function: ${error}`);
+        if (error.response.status === 429) {
+            await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+        }
+        tracks_tries++;
         if (tracks_tries < 3) {
             getTracks(playlist, authHeader, tracks_tries);
         }
@@ -176,16 +187,29 @@ async function getPlaylist(playlist, authHeader) {
     let response;
     //track the number of calls to the API if it has an error to avoid potential infinite loops
     let playlist_tries = 0;
-    try {
-        response = await axios.get(`${URL_API}/playlists/${playlist.spotify_id}`, authHeader);
-    } catch (error) {
-        console.log(`Error getting playlist: ${error}`);
-        if (playlist_tries < 10) {
-            return getPlaylist(playlist, authHeader);
+    //Wrapping API call in a function allows for it to be called recursively in case of an error being thrown
+    async function playlist(playlist, authHeader) {
+        try {
+            response = await axios.get(`${URL_API}/playlists/${playlist.spotify_id}/tracks`, authHeader);
+            const tracks = response.data.items;
+            if (response.data.next) {
+                const responseTwo = await axios.get(`${response.data.next}`, authHeader);
+                const newTracks = tracks.concat(responseTwo.data.items);
+                return newTracks;
+            }
+            return tracks;
+        } catch (error) {
+            console.log(`Error getting playlist: ${error}`);
+            if (error.response.status === 429) {
+                await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+            }
+            playlist_tries++;
+            if (playlist_tries < 10) {
+                return playlist(playlist, authHeader);
+            }
         }
     }
-    console.log(response.data.tracks.items[0].track.href);
-    return response.data.tracks;
+    return await playlist(playlist, authHeader);
 }
 
 //Get the average audio features of the tracks in a given genre
@@ -221,7 +245,7 @@ async function getAverages(genreTracks) {
         genreAvgs.loudness += genreTracks[i].loudness;
         //A value where most occuring value is more meaningful than average
         genreAvgs.mode.push(genreTracks[i].mode);
-        genreTracks.speechiness += genreTracks[i].speechiness;
+        genreAvgs.speechiness += genreTracks[i].speechiness;
         genreAvgs.tempo += genreTracks[i].tempo;
         //A value where most occuring value is more meaningful than average
         genreAvgs.time_signature.push(genreTracks[i].time_signature);
@@ -238,7 +262,7 @@ async function getAverages(genreTracks) {
     genreAvgs.liveness = genreAvgs.liveness / genreTracks.length;
     genreAvgs.loudness = genreAvgs.loudness / genreTracks.length;
     genreAvgs.mode = await findMode(genreAvgs.mode);
-    genreTracks.speechiness = genreAvgs.speechiness / genreTracks.length;
+    genreAvgs.speechiness = genreAvgs.speechiness / genreTracks.length;
     genreAvgs.tempo = genreAvgs.tempo / genreTracks.length;
     genreAvgs.time_signature = await findMode(genreAvgs.time_signature);
     genreAvgs.valence = genreAvgs.valence / genreTracks.length;
@@ -254,7 +278,7 @@ async function findMode(array) {
         //If a key equal to that value exists increment its count
         if (object[array[i]]) {
             object[array[i]] += 1;
-        //If a key equal to that value doesn't exist create it and set its count to one
+            //If a key equal to that value doesn't exist create it and set its count to one
         } else {
             object[array[i]] = 1;
         }
