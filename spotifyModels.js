@@ -108,8 +108,11 @@ async function getTracks(playlist, authHeader, tracks_tries) {
                 } catch (error) {
                     console.log(`Error in getting a specific track: ${error}`);
                     //If the returned status is too many requests this will delay any futher calls for the amount of time stated in the retry-after part of the header
-                    if (error.response.status === 429) {
-                        await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                    if (error.code !== 'ECONNRESET') {
+                        if (error.response.status === 429) {
+                            console.log(JSON.parse(Object.values(error.response.headers)[1]));
+                            await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                        }
                     }
                     track_tries++;
                     if (track_tries < 5) {
@@ -137,8 +140,11 @@ async function getTracks(playlist, authHeader, tracks_tries) {
 
                     } catch (error) {
                         console.log(`Error in getting audio features of a specific track: ${error}`);
-                        if (error.response.status === 429) {
-                            await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                        if (error.code !== 'ECONNRESET') {
+                            if (error.response.status === 429) {
+                                console.log(JSON.parse(Object.values(error.response.headers)[1]));
+                                await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                            }
                         }
                         audio_tries++;
                         if (audio_tries < 5) {
@@ -173,8 +179,11 @@ async function getTracks(playlist, authHeader, tracks_tries) {
         return tracks;
     } catch (error) {
         console.log(`General error in getTracks function: ${error}`);
-        if (error.response.status === 429) {
-            await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+        if (error.code !== 'ECONNRESET') {
+            if (error.response.status === 429) {
+                console.log(JSON.parse(Object.values(error.response.headers)[1]));
+                await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+            }
         }
         tracks_tries++;
         if (tracks_tries < 3) {
@@ -187,8 +196,9 @@ async function getPlaylist(playlist, authHeader) {
     let response;
     //track the number of calls to the API if it has an error to avoid potential infinite loops
     let playlist_tries = 0;
+    const tracks = await playlistSecondary(playlist, authHeader);
     //Wrapping API call in a function allows for it to be called recursively in case of an error being thrown
-    async function playlist(playlist, authHeader) {
+    async function playlistSecondary(playlist, authHeader) {
         try {
             response = await axios.get(`${URL_API}/playlists/${playlist.spotify_id}/tracks`, authHeader);
             const tracks = response.data.items;
@@ -199,9 +209,13 @@ async function getPlaylist(playlist, authHeader) {
             }
             return tracks;
         } catch (error) {
+            //console.log(error.response);
             console.log(`Error getting playlist: ${error}`);
-            if (error.response.status === 429) {
-                await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+            if (error.code !== 'ECONNRESET') {
+                if (error.response.status === 429) {
+                    console.log(JSON.parse(Object.values(error.response.headers)[1]));
+                    await sleep(JSON.parse(Object.values(error.response.headers)[1]) * 1001);
+                }
             }
             playlist_tries++;
             if (playlist_tries < 10) {
@@ -209,7 +223,7 @@ async function getPlaylist(playlist, authHeader) {
             }
         }
     }
-    return await playlist(playlist, authHeader);
+    return tracks;
 }
 
 //Get the average audio features of the tracks in a given genre
