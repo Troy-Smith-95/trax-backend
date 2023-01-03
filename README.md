@@ -1,9 +1,9 @@
 
 # Trax 🎵🎤
 
-Trax leverages the Spotify API to obtain the audio anaylsis of thousands of popular tracks within different genres and averages them by genre on a weekly basis. This anaylsis can then be viewed on the front end in a clean and consise manner. 
+Trax leverages the Spotify API to reliably obtain the audio analysis of thousands of popular tracks within different genres and averages them by genre on a weekly basis. This analysis can then be viewed on the front end in a clean and consise manner. 
 
-Trax was developed for musicians that are in the process of making new music. They can gain valuable insights into how their genre may be changing and adapt their music accordingly. This could mean making their song duration more closely match the average, make their music more energetic etc. Trax in a future update will also be able to generate playlists based on a specific audio profile so artists can find new musical influces or explore new sounds.
+Trax was developed for musicians that are in the process of making new music. They can gain valuable insights into how their genre may be changing and adapt their music accordingly. This could mean making their song duration more closely match the average, make their music more energetic etc. Trax in a future update will also be able to generate playlists based on a specific audio profile so artists can find new musical influences or explore new sounds.
 
 ## 📸 Screenshots
 
