@@ -46,8 +46,14 @@ In backend:
 `DB_USER`
 `DB_PASSWORD`
 `URL_TOKEN`
+`URL_API`
 `CLIENT_ID`
 `CLIENT_SECRET`
+
+URL_TOKEN = 'https://accounts.spotify.com/api/token'
+URL_API = 'https://api.spotify.com/v1'
+
+To obtain CLIENT_ID and CLIENT_SECRET, visit https://developer.spotify.com/dashboard/ to create or link to a spotify developer account (login if you already have one). Create a new app in the developer dashboard, click on the new app to go to the overview screen where you can then view the CLIENT_ID and CLIENT_SECRET.
 
 ## 🗺 API Reference
 
