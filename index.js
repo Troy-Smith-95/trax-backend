@@ -7,6 +7,7 @@ require('dotenv').config();
 const PORT = process.env.PORT || 8080;
 
 const genresRoute = require('./routes/genres');
+const usersRoute = require('./routes/users');
 const {populateData, getToken, auth_token} = require('./spotifyModels');
 
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/genres', genresRoute);
+app.use('/users', usersRoute);
 
 //Uncomment to get data
 // populateData();

@@ -6,7 +6,7 @@ require('dotenv').config();
 
 
 
- const getAll = async (req, res) => {
+const getAll = async (req, res) => {
     try {
         const genres = await knex('genres');
         res.status(200).json(genres);
