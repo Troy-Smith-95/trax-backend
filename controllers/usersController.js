@@ -8,8 +8,6 @@ const { isEmail, isEmpty, isStrongPassword } = require("validator");
 const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
 
-    console.log(username);
-
     // Validate form inputs
     if (
         isEmpty(username) ||
@@ -54,12 +52,13 @@ const registerUser = async (req, res) => {
         const newUserId = newUserIds[0];
 
         console.log(process.env.SECRET_KEY);
-        // const token = jwt.sign({ user_id: user.id }, process.env.SECRET_KEY);
+        console.log(newUserId);
+        const token = jwt.sign({ user_id: newUserId }, process.env.SECRET_KEY);
 
         res.status(201).json({
             message: "User created successfully",
             userId: newUserId,
-            // token: token
+            token: token
         })
     } catch (error) {
         res.status(500).json({
@@ -71,7 +70,7 @@ const registerUser = async (req, res) => {
 
 const checkUsername = async (req, res) => {
     const { username } = req.body;
-    
+
     //make sure username is unique
     const userUsername = await knex("users")
         .where({ username: username });
