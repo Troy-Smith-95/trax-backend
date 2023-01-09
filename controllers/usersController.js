@@ -51,8 +51,6 @@ const registerUser = async (req, res) => {
         // Responds with new user (201 Created) and JWT token
         const newUserId = newUserIds[0];
 
-        console.log(process.env.SECRET_KEY);
-        console.log(newUserId);
         const token = jwt.sign({ user_id: newUserId }, process.env.SECRET_KEY);
 
         res.status(201).json({
@@ -66,6 +64,42 @@ const registerUser = async (req, res) => {
             error
         })
     }
+}
+
+const loginUser = async (req, res) => {
+    // Validate required fields
+    if (!req.body.email || !req.body.password) {
+        return res.status(400).json({
+            message: "Email and password are required"
+        });
+    }
+
+    // Validate user credentials
+    const users = await knex("users")
+        .where({ email: req.body.email });
+    
+    if (users.length === 0) {
+        return res.status(401).json({
+            message: "Invalid Credentials"
+        })
+    }
+
+    const user = users[0];
+
+    //check that the password is correct
+    if (!bcrypt.compareSync(req.body.password, user.password)) {
+        // If invalid: Respond with Invalid Credentials (401)
+        return res.status(401).json({
+            message: "Invalid Credentials"
+        })
+    }
+    
+    const token = jwt.sign({ user_id: user.id }, process.env.SECRET_KEY);
+
+    return res.status(200).json({
+        message: "User logged in successfully",
+        token: token
+    })
 }
 
 const checkUsername = async (req, res) => {
@@ -88,5 +122,6 @@ const checkUsername = async (req, res) => {
 
 module.exports = {
     registerUser,
+    loginUser,
     checkUsername
 }
