@@ -102,6 +102,55 @@ const loginUser = async (req, res) => {
     })
 }
 
+/**
+ *  See the specific user information of the user that is logged in
+ */
+const getProfile = async (req, res) => {
+   
+    if (!req.headers.authorization) {
+        return res.status(400).json({
+            message: "Bearer token required"
+        })
+    }
+
+    const bearerTokenArray = req.headers.authorization.split(" ");
+    if (bearerTokenArray.length !== 2) {
+        return res.status(400).json({
+            message: "Bearer token required"
+        })
+    }
+
+    const token = bearerTokenArray[1];
+    // Verify the JWT
+    jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+        if (err) {
+            // if not valid -> send an error response back (401)
+            return res.status(401).json({
+                message: "Invalid token"
+            })
+        }
+
+        // - if valid JWT
+            // - in JWT payload -> grab the user id
+            // - using that user id -> get profile information for that user! (200) 
+        const users = await knex("users")
+            .where({ id: decoded.user_id });
+
+        if (users.length === 0) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        const user = users[0];
+        delete user.password;
+        delete user.id;
+
+        return res.status(200).json(user);
+    });
+}
+
+
 const checkUsername = async (req, res) => {
     const { username } = req.body;
 
@@ -123,5 +172,6 @@ const checkUsername = async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
+    getProfile,
     checkUsername
 }

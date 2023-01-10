@@ -9,4 +9,6 @@ router.route('/username').post(usersController.checkUsername);
 
 router.route('/login').post(usersController.loginUser);
 
+router.route('/profile').get(usersController.getProfile);
+
 module.exports = router;
