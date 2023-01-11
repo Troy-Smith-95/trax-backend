@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 8080;
 const genresRoute = require('./routes/genres');
 const usersRoute = require('./routes/users');
 const authRoute = require('./routes/auth');
+const inspirationRoute = require('./routes/inspiration');
 const { populateData, getToken, auth_token } = require('./spotifyModels');
 
 
@@ -126,6 +127,7 @@ passport.deserializeUser((userId, done) => {
 app.use('/genres', genresRoute);
 app.use('/users', usersRoute);
 app.use('/auth', authRoute);
+app.use('/inspiration', inspirationRoute);
 
 //Uncomment to get data
 // populateData();
