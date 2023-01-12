@@ -10,6 +10,7 @@ exports.up = function (knex) {
         table.string('password')
         table.string('spotify_id');
         table.string('display_name');
+        table.string('refresh_token');
     });
 };
 

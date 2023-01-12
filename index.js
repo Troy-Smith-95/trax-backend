@@ -65,7 +65,8 @@ passport.use(
                                         .where({ email: profile._json.email })
                                         .update({
                                             spotify_id: profile.id,
-                                            display_name: profile.displayName
+                                            display_name: profile.displayName,
+                                            refresh_token: refreshToken
                                         })
                                         .then(userUpdated => {
                                             done(null, { id: userExisting[0] });
@@ -79,7 +80,8 @@ passport.use(
                                         .insert({
                                             email: profile._json.email,
                                             spotify_id: profile.id,
-                                            display_name: profile.displayName
+                                            display_name: profile.displayName,
+                                            refresh_token: refreshToken
                                         })
                                         .then(userId => {
                                             // Pass the user object to serialize function
@@ -131,7 +133,6 @@ app.use('/inspiration', inspirationRoute);
 
 //Uncomment to get data
 // populateData();
-
 
 
 app.listen(PORT, () => {

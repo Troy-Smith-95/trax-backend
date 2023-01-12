@@ -4,7 +4,7 @@ const router = express.Router();
 const passport = require('passport');
 
 router.get('/spotify', passport.authenticate('spotify', {
-    scope: ['user-read-email', 'user-read-private'],
+    scope: ['user-read-email', 'user-read-private', 'playlist-modify-public', 'playlist-modify-private', 'playlist-read-private', 'playlist-read-collaborative'],
     showDialog: true
   }));
 
@@ -27,7 +27,11 @@ router.get('/profile', (req, res) => {
     // If `req.user` isn't found send back a 401 Unauthorized response
     if (req.user === undefined)
       return res.status(401).json({ message: 'Unauthorized' });
-  
+
+      delete req.user.id;
+      delete req.user.password;
+      delete req.user.refresh_token;
+
     // If user is currently authenticated, send back user info
     res.status(200).json(req.user);
   });

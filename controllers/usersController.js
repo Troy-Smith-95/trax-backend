@@ -145,6 +145,7 @@ const getProfile = async (req, res) => {
         const user = users[0];
         delete user.password;
         delete user.id;
+        delete user.refresh_token;
 
         return res.status(200).json(user);
     });
