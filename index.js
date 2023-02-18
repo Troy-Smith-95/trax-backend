@@ -52,6 +52,7 @@ passport.use(
                 .where({ spotify_id: profile.id })
                 .then(user => {
                     if (user.length) {
+                        console.log(user);
                         // If user is found, pass the user object to serialize function
                         done(null, user[0]);
                     } else {

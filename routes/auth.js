@@ -28,9 +28,9 @@ router.get('/profile', (req, res) => {
     if (req.user === undefined)
       return res.status(401).json({ message: 'Unauthorized' });
 
-      delete req.user.id;
-      delete req.user.password;
-      delete req.user.refresh_token;
+      // delete req.user.id;
+      // delete req.user.password;
+      // delete req.user.refresh_token;
 
     // If user is currently authenticated, send back user info
     res.status(200).json(req.user);

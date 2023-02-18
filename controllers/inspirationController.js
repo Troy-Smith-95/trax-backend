@@ -24,8 +24,13 @@ const authHeader = {};
 //function to retrieve the access token 
 async function getToken(refresh_token) {
     let response;
+    let data;
 
-    const data = qs.stringify({ 'grant_type': 'refresh_token', 'refresh_token': `${refresh_token}` });
+    if (refresh_token){
+        data = qs.stringify({ 'grant_type': 'refresh_token', 'refresh_token': `${refresh_token}` });
+    } else {
+        data = qs.stringify({ 'grant_type': 'client_credentials' });
+    }
 
     try {
         response = await axios.post(URL_TOKEN, data, headers)
