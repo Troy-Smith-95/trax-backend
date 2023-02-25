@@ -3,7 +3,7 @@
 
 Trax leverages the Spotify API to reliably obtain the audio analysis of thousands of popular tracks within different genres and averages them by genre on a weekly basis. This analysis can then be viewed on the front end in a clean and consise manner. 
 
-Trax was developed for musicians that are in the process of making new music. They can gain valuable insights into how their genre may be changing and adapt their music accordingly. This could mean making their song duration more closely match the average, make their music more energetic etc. Trax in a future update will also be able to generate playlists based on a specific audio profile so artists can find new musical influences or explore new sounds.
+Trax was developed for musicians that are in the process of making new music. They can gain valuable insights into how their genre may be changing and adapt their music accordingly. This could mean making their song duration more closely match the average, make their music more energetic etc. Trax is also able to generate playlists based on a specific audio profile so artists can find new musical influences or explore new sounds.
 
 ## 📸 Screenshots
 
@@ -15,6 +15,9 @@ Dashboard
 
 ![Dasboard](https://user-images.githubusercontent.com/114879201/207756636-3e6f2b51-5677-4d7d-aa6a-1f8ef14cb733.png)
 
+Inspiration
+
+![Inspiration](https://user-images.githubusercontent.com/114879201/221374929-958f6f9f-03dc-4773-8cb9-bbd25cc0e463.png)
 
 ## 👾 Tech Stack
 
@@ -28,6 +31,8 @@ Dashboard
 - Pulls data for thousands of songs via spotify API while handling any errors to make sure data collection completes without crashing
 - Averages out the data for thousands of songs to generate weekly insights and trends
 - Uses progress bars and charts to cleanly display data
+- Generates and displays playlists based on different audio profiles
+- Save playlists to users' Spotify account
 - How to feature explains the platform to the user
 - Infomation icons in dashboard provide the user more context on specific features
 - Reponsive design from mobile to desktop
@@ -49,6 +54,11 @@ In backend:
 `URL_API`
 `CLIENT_ID`
 `CLIENT_SECRET`
+`CLIENT_URL`
+`CLIENT_URL_SIGNIN`
+`SECRET_KEY`
+`SESSION_SECRET`
+`SPOTIFY_CALLBACK_URL`
 
 URL_TOKEN = 'https://accounts.spotify.com/api/token'
 URL_API = 'https://api.spotify.com/v1'
@@ -108,7 +118,120 @@ Return:
     ...
 ]
 
+#### Register user
 
+```http
+  POST /users/register
+```
+
+Return:
+
+{
+  message: "User created successfully", 
+  userId: ..., 
+  token: ...
+}
+
+#### Check username
+
+```http
+  POST /users/username
+```
+
+Return:
+
+{
+  message: "Username already exists"
+}
+
+or 
+
+{
+  message: "Username is unique"
+}
+
+#### Login User
+
+```http
+  POST /users/login
+```
+
+Return:
+
+{
+  message: "User logged in successfully",
+  token: ...
+}
+
+#### Get user profile
+
+```http
+  GET /users/profile
+```
+
+Return:
+
+{
+  username: ...,
+  email: ...,
+  spotify_id: ...,
+  display_name: ...
+}
+
+#### Generate playlist
+
+```http
+  POST /inspiration/generate
+```
+
+Return:
+
+[
+  {
+    name: ...,
+    artist: ...,
+    uri: ...,
+    artwork: ...
+  },
+  ...
+]
+
+#### Save playlist
+
+```http
+  POST /inspiration/save
+```
+
+Return:
+
+'Success!'
+
+#### Login with Spotify
+
+```http
+  GET /auth/spotify
+```
+
+#### Logout with Spotify
+
+```http
+  GET /auth/logout
+```
+
+#### Get user profile (auth)
+
+```http
+  GET /auth/profile
+```
+
+Return: 
+
+{
+  username: ...,
+  email: ...,
+  spotify_id: ...,
+  display_name: ...
+}
 
 ## ⚙️ Installation
 
@@ -196,10 +319,6 @@ I learned how to used async await to make my code run in a synchronous fashion a
 
 ## 🧭 Roadmap
 
-- Add user login and third part sign-in/OAuth with Spotify
-
 - Add funcitonilty to search for other music (songs, albums, playlists) to analyze and compare against genres
 
 - Ability to save this music to your account to reference in the future
-
-- Add inspiration generator - ability to find new songs and generate playlists based around certain audio profiles to help artists find new influences
